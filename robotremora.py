@@ -70,6 +70,7 @@ def analysis_data(databytes,datalen): # 分析串口接收到的rflink数据,更
         roboremora.pumpout_state = remorastate.PumpState((databytes[1]>>2)&1)
         roboremora.gimbal_state = remorastate.GimbalState((databytes[1])&3)
         roboremora.flywheel_state = remorastate.FlywheelState((databytes[2]>>7)&1)
+        roboremora.pump_state = remorastate.PumpState((databytes[2]>>6)&1)
 
     elif command is rflink.Command.READ_SINE_MOTION_PARAM:
         datatuple = struct.unpack('fff', databytes[1:])
@@ -460,6 +461,10 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.pumpstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
         self.stateshow_layout.addWidget(self.pumpstate_fixed_label, 6, 0, 1, 1, QtCore.Qt.AlignCenter)
 
+        self.pumpstate_label = QtWidgets.QLabel('关闭')
+        self.pumpstate_label.setFont(QtGui.QFont('SimSun', 12))
+        self.stateshow_layout.addWidget(self.pumpstate_label, 6, 1, 1, 1, QtCore.Qt.AlignCenter)
+
         self.pumpinstate_fixed_label = QtWidgets.QLabel('吸水泵')
         self.pumpinstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
         self.stateshow_layout.addWidget(self.pumpinstate_fixed_label, 7, 0, 1, 1, QtCore.Qt.AlignCenter)
@@ -725,6 +730,14 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         # self.attachcc_pump_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
         # self.attachcc_layout.addWidget(self.attachcc_pump_label, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
 
+        self.attachcc_pumpopen_button = QtWidgets.QPushButton('开启水泵')
+        self.attachcc_layout.addWidget(self.attachcc_pumpopen_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
+        self.attachcc_pumpopen_button.setObjectName("SET_PUMP_ON")
+
+        self.attachcc_pumpclose_button = QtWidgets.QPushButton('关闭水泵')
+        self.attachcc_layout.addWidget(self.attachcc_pumpclose_button, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
+        self.attachcc_pumpclose_button.setObjectName("SET_PUMP_OFF")
+
         self.attachcc_pumpinopen_button = QtWidgets.QPushButton('开启吸水')
         self.attachcc_layout.addWidget(self.attachcc_pumpinopen_button, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.attachcc_pumpinopen_button.setObjectName("SET_PUMP_IN_ON")
@@ -853,6 +866,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial1_com_combo.addItem('COM6')
         self.serial1_com_combo.addItem('COM7')
         self.serial1_com_combo.addItem('COM9')
+        self.serial1_com_combo.addItem('COM10')
         self.serial1_com_combo.addItem('COM11')
         self.serial1_com_combo.addItem('COM12')
         self.serial1_com_combo.setFixedSize(120, 30)
@@ -899,6 +913,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial2_com_combo.addItem('COM6')
         self.serial2_com_combo.addItem('COM7')
         self.serial2_com_combo.addItem('COM9')
+        self.serial2_com_combo.addItem('COM10')
         self.serial2_com_combo.addItem('COM11')
         self.serial2_com_combo.addItem('COM12')
         self.serial2_com_combo.setFixedSize(120, 30)
@@ -1123,6 +1138,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cpgcc_readparam_button.clicked.connect(self.console_button_clicked)
         self.attachcc_attach_button.clicked.connect(self.console_button_clicked)
         self.attachcc_detach_button.clicked.connect(self.console_button_clicked)
+        self.attachcc_pumpopen_button.clicked.connect(self.console_button_clicked)
+        self.attachcc_pumpclose_button.clicked.connect(self.console_button_clicked)
         self.attachcc_pumpinopen_button.clicked.connect(self.console_button_clicked)
         self.attachcc_pumpinclose_button.clicked.connect(self.console_button_clicked)
         self.attachcc_pumpoutopen_button.clicked.connect(self.console_button_clicked)
@@ -2017,6 +2034,15 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
                 self.valve2state_label.setPalette(pal)
 
+            if roboremora.pump_state is remorastate.PumpState.PUMP_OFF:
+                self.pumpstate_label.setText('停止')
+                pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
+                self.pumpstate_label.setPalette(pal)
+            elif roboremora.pump_state is remorastate.PumpState.PUMP_ON:
+                self.pumpstate_label.setText('运行')
+                pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
+                self.pumpstate_label.setPalette(pal)
+
             if roboremora.pumpin_state is remorastate.PumpState.PUMP_OFF:
                 self.pumpinstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
@@ -2090,6 +2116,9 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             self.timelist.append(self.showtime)
             self.showtime = self.showtime + 0.2
             self.sensor_data_canvas.plot(self.timelist, self.datalist)
+            low_bound = self.datalist[0] - self.datalist[0]*0.2 
+            up_bound = self.datalist[0] + self.datalist[0]*0.2 
+            self.sensor_data_canvas.set_ylim(low_bound, up_bound)
 
             if len(self.datalist) > 100:
                 self.timelist.pop(0)

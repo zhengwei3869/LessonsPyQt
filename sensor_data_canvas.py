@@ -45,3 +45,6 @@ class SensorDataCanvas(FigureCanvas):
 
     def clear(self):
         self.plot([],[])
+
+    def set_ylim(self, low_bound, up_bound):
+        self.ax.set_ylim(low_bound, up_bound)

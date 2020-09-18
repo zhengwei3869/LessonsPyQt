@@ -48,6 +48,7 @@ class RoboRemoraState:
         self.swim_state = SwimState.SWIM_FORCESTOP.value
         self.valve1_state = ValveState.VALVE_OFF.value
         self.valve2_state = ValveState.VALVE_OFF.value
+        self.pump_state = PumpState.PUMP_OFF.value
         self.pumpin_state = PumpState.PUMP_OFF.value
         self.pumpout_state = PumpState.PUMP_OFF.value
         self.gimbal_state = GimbalState.GIMBAL_STOP.value
