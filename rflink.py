@@ -57,6 +57,7 @@ Command = Enum('Command',(\
     'SET_FLYWHEEL_STOP',\
     'SET_FLYWHEEL_DATA',\
     'SET_FLYWHEEL_CMD',\
+    'SET_TARGET_POS',\
     'SET_DATASHOW_OVER',\
     'READ_ROBOT_STATUS',\
     'READ_CPG_PARAM',\

@@ -16,6 +16,10 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import analysis_btn_win # 解析数据窗口
 import storage_btn_win # 储存数据窗口
 import sendback_btn_win # 回传数据窗口
+import attach_control_btn_win # 吸附控制窗口
+import gimbal_control_btn_win # 云台控制窗口
+import flywheel_control_btn_win # 飞轮控制窗口
+
 import rflink # Robotic Fish 通讯协议
 import serctl # 串口控制工具
 import remorastate # 机器人状态
@@ -296,7 +300,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.receive_data_thread = ReceiveDataThread()
         self.polling_state_thread = PollingStateThread()
         self.analysis_data_thread = AnalysisDataThread()
-
+        
         # 初始化UI
         self.init_ui()
 
@@ -310,11 +314,44 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.datashow_storage_button.clicked.connect(self.STBW.handle_click)
         self.STBW._signal.connect(self.datashow_storage_button_clicked)
         self.close_signal.connect(self.STBW.handle_close)
+
         ## 回传数据子窗口
         self.SBBW = sendback_btn_win.SendbackBtnWin()
         self.datashow_save_button.clicked.connect(self.SBBW.handle_click)
         self.SBBW._signal.connect(self.datashow_save_button_clicked)
         self.close_signal.connect(self.SBBW.handle_close)
+
+        ## 吸附控制子窗口
+        self.ACBW = attach_control_btn_win.AttachControlBtnWin()
+        self.open_attach_control_button.clicked.connect(self.ACBW.handle_click)
+        self.ACBW.attachcc_attach_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_detach_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpopen_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpclose_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpinopen_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpinclose_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpoutopen_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_pumpoutclose_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_v1open_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_v1close_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_v2open_button.clicked.connect(self.console_button_clicked)
+        self.ACBW.attachcc_v2close_button.clicked.connect(self.console_button_clicked)
+        self.close_signal.connect(self.ACBW.handle_close)
+
+        ## 云台控制子窗口
+        self.GCBW = gimbal_control_btn_win.GimbalControlBtnWin()
+        self.open_gimbal_control_button.clicked.connect(self.GCBW.handle_click)
+        self.GCBW.gimbalcc_start_button.clicked.connect(self.console_button_clicked)
+        self.GCBW.gimbalcc_stop_button.clicked.connect(self.console_button_clicked)
+        self.GCBW.gimbalcc_zero_button.clicked.connect(self.console_button_clicked)
+        self.close_signal.connect(self.GCBW.handle_close)
+
+        ## 飞轮控制子窗口
+        self.FCBW = flywheel_control_btn_win.FlywheelControlBtnWin()
+        self.open_flywheel_control_button.clicked.connect(self.FCBW.handle_click)
+        self.FCBW.flywheelcc_start_button.clicked.connect(self.console_button_clicked)
+        self.FCBW.flywheelcc_stop_button.clicked.connect(self.console_button_clicked)
+        self.close_signal.connect(self.FCBW.handle_close)
 
         # 绘图部分变量初始化
         self.showtime = 0
@@ -429,7 +466,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.swimstate_label.setFont(QtGui.QFont('SimSun', 12))
         self.stateshow_layout.addWidget(self.swimstate_label, 1, 1, 1, 1, QtCore.Qt.AlignCenter)
 
-        self.cpgstate_fixed_label = QtWidgets.QLabel('运动参数（正弦）')
+        self.cpgstate_fixed_label = QtWidgets.QLabel('运动参数')
         self.cpgstate_fixed_label.setFont(QtGui.QFont('SimSun', 12 ,QtGui.QFont.Bold))
         self.stateshow_layout.addWidget(self.cpgstate_fixed_label, 2, 0, 1, 2, QtCore.Qt.AlignLeft)
 
@@ -457,66 +494,9 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cpgoffset_label.setFont(QtGui.QFont('SimSun', 12))
         self.stateshow_layout.addWidget(self.cpgoffset_label, 5, 1, 1, 1, QtCore.Qt.AlignCenter)
 
-        self.pumpstate_fixed_label = QtWidgets.QLabel('水泵状态')
-        self.pumpstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.pumpstate_fixed_label, 6, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.pumpstate_label = QtWidgets.QLabel('关闭')
-        self.pumpstate_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.pumpstate_label, 6, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.pumpinstate_fixed_label = QtWidgets.QLabel('吸水泵')
-        self.pumpinstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.pumpinstate_fixed_label, 7, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.pumpinstate_label = QtWidgets.QLabel('关闭')
-        self.pumpinstate_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.pumpinstate_label, 7, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.pumpoutstate_fixed_label = QtWidgets.QLabel('排水泵')
-        self.pumpoutstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.pumpoutstate_fixed_label, 8, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.pumpoutstate_label = QtWidgets.QLabel('关闭')
-        self.pumpoutstate_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.pumpoutstate_label, 8, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.valvestate_fixed_label = QtWidgets.QLabel('磁阀状态')
-        self.valvestate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.valvestate_fixed_label, 9, 0, 1, 2, QtCore.Qt.AlignLeft)
-
-        self.valve1state_fixed_label = QtWidgets.QLabel('阀1')
-        self.valve1state_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.valve1state_fixed_label, 10, 0, 1, 1, QtCore.Qt.AlignRight)
-
-        self.valve1state_label = QtWidgets.QLabel('关闭')
-        self.valve1state_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.valve1state_label, 10, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.valve2state_fixed_label = QtWidgets.QLabel('阀2')
-        self.valve2state_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.valve2state_fixed_label, 11, 0, 1, 1, QtCore.Qt.AlignRight)
-
-        self.valve2state_label = QtWidgets.QLabel('关闭')
-        self.valve2state_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.valve2state_label, 11, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.gimbalstate_fixed_label = QtWidgets.QLabel('云台状态')
-        self.gimbalstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.gimbalstate_fixed_label, 12, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.gimbalstate_label = QtWidgets.QLabel('施工中')
-        self.gimbalstate_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.gimbalstate_label, 12, 1, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.flywheelstate_fixed_label = QtWidgets.QLabel('飞轮状态')
-        self.flywheelstate_fixed_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        self.stateshow_layout.addWidget(self.flywheelstate_fixed_label, 13, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.flywheelstate_label = QtWidgets.QLabel('施工中')
-        self.flywheelstate_label.setFont(QtGui.QFont('SimSun', 12))
-        self.stateshow_layout.addWidget(self.flywheelstate_label, 13, 1, 1, 1, QtCore.Qt.AlignCenter)
-
+       
+        
+        
     # 初始化控制台面板
     def init_console_panel(self):
         """
@@ -529,9 +509,9 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.flywheelcc_frame:飞轮控制
         :return:
         """
-        self.console_title_label = QtWidgets.QLabel('RoboRemora控制台')
+        self.console_title_label = QtWidgets.QLabel('机器鱼控制台')
         self.console_title_label.setFont(QtGui.QFont('Microsoft YaHei', 20, QtGui.QFont.Bold))
-        self.console_layout.addWidget(self.console_title_label, 0, 0, 1, 15, QtCore.Qt.AlignCenter)
+        self.console_layout.addWidget(self.console_title_label, 0, 0, 1, 10, QtCore.Qt.AlignCenter)
 
         # 游动控制
         self.swimcc_frame = QtWidgets.QFrame()
@@ -540,75 +520,91 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.swimcc_frame.setFrameShape(QtWidgets.QFrame.Box)
         self.swimcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.swimcc_frame.setLineWidth(1)
-        self.console_layout.addWidget(self.swimcc_frame, 1, 0, 10, 4)
+        self.console_layout.addWidget(self.swimcc_frame, 1, 0, 10, 5)
 
-        self.swimcc_fixed_label = QtWidgets.QLabel('游动状态')
+        self.swimcc_fixed_label = QtWidgets.QLabel('基础运动控制')
         self.swimcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
         self.swimcc_layout.addWidget(self.swimcc_fixed_label, 1, 0, 1, 4, QtCore.Qt.AlignCenter)
 
-        self.swimcc_start_button = QtWidgets.QPushButton('启动')
+        self.swimcc_start_button = QtWidgets.QPushButton('启动(q)')
         self.swimcc_layout.addWidget(self.swimcc_start_button, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_start_button.setObjectName("SET_SWIM_RUN")
+        self.swimcc_start_button.setShortcut('q')
 
-        self.swimcc_stop_button = QtWidgets.QPushButton('暂停')
+        self.swimcc_stop_button = QtWidgets.QPushButton('暂停(w)')
         self.swimcc_layout.addWidget(self.swimcc_stop_button, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_stop_button.setObjectName("SET_SWIM_STOP")
+        self.swimcc_stop_button.setShortcut('w')
 
-        self.swimcc_forcestop_button = QtWidgets.QPushButton('停止')
+        self.swimcc_forcestop_button = QtWidgets.QPushButton('停止(e)')
         self.swimcc_layout.addWidget(self.swimcc_forcestop_button, 2, 2, 1,  1, QtCore.Qt.AlignCenter)
         self.swimcc_forcestop_button.setObjectName("SET_SWIM_FORCESTOP")
+        self.swimcc_forcestop_button.setShortcut('e')
 
-        self.swimcc_turnleft_button = QtWidgets.QPushButton('左转')
+        self.swimcc_turnleft_button = QtWidgets.QPushButton('左转(a)')
         self.swimcc_layout.addWidget(self.swimcc_turnleft_button, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_turnleft_button.setObjectName("SET_SWIM_LEFT")
+        self.swimcc_turnleft_button.setShortcut('a')
 
-        self.swimcc_straight_button = QtWidgets.QPushButton('直游')
+        self.swimcc_straight_button = QtWidgets.QPushButton('直游(s)')
         self.swimcc_layout.addWidget(self.swimcc_straight_button, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_straight_button.setObjectName("SET_SWIM_STRAIGHT")
+        self.swimcc_straight_button.setShortcut('s')
 
-        self.swimcc_turnright_button = QtWidgets.QPushButton('右转')
+        self.swimcc_turnright_button = QtWidgets.QPushButton('右转(d)')
         self.swimcc_layout.addWidget(self.swimcc_turnright_button, 3, 2, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_turnright_button.setObjectName("SET_SWIM_RIGHT")
+        self.swimcc_turnright_button.setShortcut('d')
 
-        self.swimcc_speedup_button = QtWidgets.QPushButton('加速')
+        self.swimcc_speedup_button = QtWidgets.QPushButton('加速(z)')
         self.swimcc_layout.addWidget(self.swimcc_speedup_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_speedup_button.setObjectName("SET_SWIM_SPEEDUP")
+        self.swimcc_speedup_button.setShortcut('z')
 
-        self.swimcc_speeddown_button = QtWidgets.QPushButton('减速')
+        self.swimcc_speeddown_button = QtWidgets.QPushButton('减速(x)')
         self.swimcc_layout.addWidget(self.swimcc_speeddown_button, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_speeddown_button.setObjectName("SET_SWIM_SPEEDDOWN")
+        self.swimcc_speeddown_button.setShortcut('x')
 
-        self.swimcc_raise_button = QtWidgets.QPushButton('上浮')
+        self.swimcc_raise_button = QtWidgets.QPushButton('上浮(↑)')
         self.swimcc_layout.addWidget(self.swimcc_raise_button, 2, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_raise_button.setObjectName("SET_SWIM_UP")
+        self.swimcc_raise_button.setShortcut(QtCore.Qt.Key_Up)
 
-        self.swimcc_dive_button = QtWidgets.QPushButton('下潜')
+        self.swimcc_dive_button = QtWidgets.QPushButton('下潜(↓)')
         self.swimcc_layout.addWidget(self.swimcc_dive_button, 3, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_dive_button.setObjectName("SET_SWIM_DOWN")
+        self.swimcc_dive_button.setShortcut(QtCore.Qt.Key_Down)
 
-        self.swimcc_leftfinzero_button = QtWidgets.QPushButton('左胸鳍回中')
+        self.swimcc_leftfinzero_button = QtWidgets.QPushButton('左胸鳍回中(i)')
         self.swimcc_layout.addWidget(self.swimcc_leftfinzero_button, 4, 2, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_leftfinzero_button.setObjectName("SET_LEFTPECFIN_ZERO")
+        self.swimcc_leftfinzero_button.setShortcut('i')
 
-        self.swimcc_rightfinzero_button = QtWidgets.QPushButton('右胸鳍回中')
+        self.swimcc_rightfinzero_button = QtWidgets.QPushButton('右胸鳍回中(k)')
         self.swimcc_layout.addWidget(self.swimcc_rightfinzero_button, 5, 2, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_rightfinzero_button.setObjectName("SET_RIGHTPECFIN_ZERO")
+        self.swimcc_rightfinzero_button.setShortcut('k')
 
-        self.swimcc_leftfinup_button = QtWidgets.QPushButton('左胸鳍+')
+        self.swimcc_leftfinup_button = QtWidgets.QPushButton('左胸鳍+(u)')
         self.swimcc_layout.addWidget(self.swimcc_leftfinup_button, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_leftfinup_button.setObjectName("SET_LEFTPECFIN_UP")
+        self.swimcc_leftfinup_button.setShortcut('u')
 
-        self.swimcc_leftfindown_button = QtWidgets.QPushButton('左胸鳍-')
+        self.swimcc_leftfindown_button = QtWidgets.QPushButton('左胸鳍-(o)')
         self.swimcc_layout.addWidget(self.swimcc_leftfindown_button, 4, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_leftfindown_button.setObjectName("SET_LEFTPECFIN_DOWN")
+        self.swimcc_leftfindown_button.setShortcut('o')
 
-        self.swimcc_rightfinup_button = QtWidgets.QPushButton('右胸鳍+')
+        self.swimcc_rightfinup_button = QtWidgets.QPushButton('右胸鳍+(j)')
         self.swimcc_layout.addWidget(self.swimcc_rightfinup_button, 5, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_rightfinup_button.setObjectName("SET_RIGHTPECFIN_UP")
+        self.swimcc_rightfinup_button.setShortcut('j')
 
-        self.swimcc_rightfindown_button = QtWidgets.QPushButton('右胸鳍-')
+        self.swimcc_rightfindown_button = QtWidgets.QPushButton('右胸鳍-(l)')
         self.swimcc_layout.addWidget(self.swimcc_rightfindown_button, 5, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_rightfindown_button.setObjectName("SET_RIGHTPECFIN_DOWN")
+        self.swimcc_rightfindown_button.setShortcut('l')
 
         # CPG参数设置
         self.cpgcc_frame = QtWidgets.QFrame()
@@ -617,7 +613,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cpgcc_frame.setFrameShape(QtWidgets.QFrame.Box)
         self.cpgcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.cpgcc_frame.setLineWidth(1)
-        self.console_layout.addWidget(self.cpgcc_frame, 1, 4, 10, 3)
+        self.console_layout.addWidget(self.cpgcc_frame, 1, 5, 10, 2)
 
         self.cpgcc_fixed_label = QtWidgets.QLabel('运动参数设置')
         self.cpgcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
@@ -625,10 +621,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_amp_label = QtWidgets.QLabel('幅度')
         self.cpgcc_amp_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
+        self.cpgcc_amp_label.setFixedSize(80, 25)
         self.cpgcc_layout.addWidget(self.cpgcc_amp_label, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
 
         self.cpgcc_amp_edit = QtWidgets.QLineEdit()
-        self.cpgcc_amp_edit.setFixedSize(70,30)
+        self.cpgcc_amp_edit.setFixedSize(120, 25)
         self.cpgcc_amp_edit.setPlaceholderText('0~30')
         double_validator1 = QtGui.QDoubleValidator()
         double_validator1.setRange(0, 30)
@@ -643,10 +640,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_freq_label = QtWidgets.QLabel('频率')
         self.cpgcc_freq_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
+        self.cpgcc_freq_label.setFixedSize(80, 25)
         self.cpgcc_layout.addWidget(self.cpgcc_freq_label, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
 
         self.cpgcc_freq_edit = QtWidgets.QLineEdit()
-        self.cpgcc_freq_edit.setFixedSize(70, 30)
+        self.cpgcc_freq_edit.setFixedSize(120, 25)
         self.cpgcc_freq_edit.setPlaceholderText('0~3.0')
         double_validator2 = QtGui.QDoubleValidator()
         double_validator2.setRange(0, 3.0)
@@ -661,10 +659,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_offset_label = QtWidgets.QLabel('偏移')
         self.cpgcc_offset_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
+        self.cpgcc_offset_label.setFixedSize(80, 25)
         self.cpgcc_layout.addWidget(self.cpgcc_offset_label, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
 
         self.cpgcc_offset_edit = QtWidgets.QLineEdit()
-        self.cpgcc_offset_edit.setFixedSize(70, 30)
+        self.cpgcc_offset_edit.setFixedSize(120, 25)
         self.cpgcc_offset_edit.setPlaceholderText('-30~30')
         double_validator3 = QtGui.QDoubleValidator()
         double_validator3.setRange(-30, 30)
@@ -677,129 +676,45 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cpgcc_layout.addWidget(self.cpgcc_offset_button, 4, 2, 1, 1, QtCore.Qt.AlignCenter)
         self.cpgcc_offset_button.setObjectName("SET_SINE_MOTION_OFFSET")
 
-        self.cpgcc_readparam_button = QtWidgets.QPushButton('读取参数')
+        self.cpgcc_readparam_button = QtWidgets.QPushButton('读取参数(r)')
         self.cpgcc_layout.addWidget(self.cpgcc_readparam_button, 5, 0, 1, 3, QtCore.Qt.AlignCenter)
         self.cpgcc_readparam_button.setObjectName("READ_SINE_MOTION_PARAM")
+        self.cpgcc_readparam_button.setShortcut('r')
 
-        # 吸附控制
-        self.attachcc_frame = QtWidgets.QFrame()
-        self.attachcc_layout = QtWidgets.QGridLayout()
-        self.attachcc_frame.setLayout(self.attachcc_layout)
-        self.attachcc_frame.setFrameShape(QtWidgets.QFrame.Box)
-        self.attachcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.attachcc_frame.setLineWidth(1)
-        self.console_layout.addWidget(self.attachcc_frame, 1, 7, 10, 3)
+        # 高级控制选项
+        self.advancedcc_frame = QtWidgets.QFrame()
+        self.advancedcc_layout = QtWidgets.QGridLayout()
+        self.advancedcc_frame.setLayout(self.advancedcc_layout)
+        self.advancedcc_frame.setFrameShape(QtWidgets.QFrame.Box)
+        self.advancedcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.advancedcc_frame.setLineWidth(1)
+        self.console_layout.addWidget(self.advancedcc_frame, 1, 7, 10, 3)
 
-        self.attachcc_fixed_label = QtWidgets.QLabel('吸附控制')
-        self.attachcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
-        self.attachcc_layout.addWidget(self.attachcc_fixed_label, 1, 0, 1, 3, QtCore.Qt.AlignCenter)
+        self.advancedcc_fixed_label = QtWidgets.QLabel('高级控制功能')
+        self.advancedcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
+        self.advancedcc_layout.addWidget(self.advancedcc_fixed_label, 1, 0, 1, 3, QtCore.Qt.AlignCenter)
+        # 吸附控制按钮
+        self.open_attach_control_button = QtWidgets.QPushButton('吸附控制')
+        self.advancedcc_layout.addWidget(self.open_attach_control_button, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
+        # 云台控制按钮
+        self.open_gimbal_control_button = QtWidgets.QPushButton('云台控制')
+        self.advancedcc_layout.addWidget(self.open_gimbal_control_button, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
+        # 飞轮控制按钮
+        self.open_flywheel_control_button = QtWidgets.QPushButton('飞轮控制')
+        self.advancedcc_layout.addWidget(self.open_flywheel_control_button, 2, 2, 1, 1, QtCore.Qt.AlignCenter)
+        # 深度控制按钮
+        self.open_depth_control_button = QtWidgets.QPushButton('深度控制')
+        self.advancedcc_layout.addWidget(self.open_depth_control_button, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
+        # 位置控制按钮
+        self.open_position_control_button = QtWidgets.QPushButton('位置控制')
+        self.advancedcc_layout.addWidget(self.open_position_control_button, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
+        # 速度控制按钮
+        self.open_velocity_control_button = QtWidgets.QPushButton('速度控制')
+        self.advancedcc_layout.addWidget(self.open_velocity_control_button, 3, 2, 1, 1, QtCore.Qt.AlignCenter)
+        # 跟踪控制按钮
+        self.open_targettracking_control_button = QtWidgets.QPushButton('跟踪控制')
+        self.advancedcc_layout.addWidget(self.open_targettracking_control_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
 
-        self.attachcc_attach_button = QtWidgets.QPushButton('吸附')
-        self.attachcc_layout.addWidget(self.attachcc_attach_button, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_attach_button.setObjectName("GOTO_ATTACH")
-
-        self.attachcc_detach_button = QtWidgets.QPushButton('脱附')
-        self.attachcc_layout.addWidget(self.attachcc_detach_button, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_detach_button.setObjectName("GOTO_DETACH")
-
-        # self.attachcc_valve1_label = QtWidgets.QLabel('阀1')
-        # self.attachcc_valve1_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        # self.attachcc_layout.addWidget(self.attachcc_valve1_label, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.attachcc_v1open_button = QtWidgets.QPushButton('开启阀1')
-        self.attachcc_layout.addWidget(self.attachcc_v1open_button, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_v1open_button.setObjectName("SET_VALVE1_ON")
-
-        self.attachcc_v1close_button = QtWidgets.QPushButton('关闭阀1')
-        self.attachcc_layout.addWidget(self.attachcc_v1close_button, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_v1close_button.setObjectName("SET_VALVE1_OFF")
-
-        # self.attachcc_valve2_label = QtWidgets.QLabel('阀2')
-        # self.attachcc_valve2_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        # self.attachcc_layout.addWidget(self.attachcc_valve2_label, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.attachcc_v2open_button = QtWidgets.QPushButton('开启阀2')
-        self.attachcc_layout.addWidget(self.attachcc_v2open_button, 2, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_v2open_button.setObjectName("SET_VALVE2_ON")
-
-        self.attachcc_v2close_button = QtWidgets.QPushButton('关闭阀2')
-        self.attachcc_layout.addWidget(self.attachcc_v2close_button, 3, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_v2close_button.setObjectName("SET_VALVE2_OFF")
-
-        # self.attachcc_pump_label = QtWidgets.QLabel('水泵')
-        # self.attachcc_pump_label.setFont(QtGui.QFont('SimSun', 12, QtGui.QFont.Bold))
-        # self.attachcc_layout.addWidget(self.attachcc_pump_label, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
-
-        self.attachcc_pumpopen_button = QtWidgets.QPushButton('开启水泵')
-        self.attachcc_layout.addWidget(self.attachcc_pumpopen_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpopen_button.setObjectName("SET_PUMP_ON")
-
-        self.attachcc_pumpclose_button = QtWidgets.QPushButton('关闭水泵')
-        self.attachcc_layout.addWidget(self.attachcc_pumpclose_button, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpclose_button.setObjectName("SET_PUMP_OFF")
-
-        self.attachcc_pumpinopen_button = QtWidgets.QPushButton('开启吸水')
-        self.attachcc_layout.addWidget(self.attachcc_pumpinopen_button, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpinopen_button.setObjectName("SET_PUMP_IN_ON")
-
-        self.attachcc_pumpinclose_button = QtWidgets.QPushButton('关闭吸水')
-        self.attachcc_layout.addWidget(self.attachcc_pumpinclose_button, 5, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpinclose_button.setObjectName("SET_PUMP_IN_OFF")
-
-        self.attachcc_pumpoutopen_button = QtWidgets.QPushButton('开启排水')
-        self.attachcc_layout.addWidget(self.attachcc_pumpoutopen_button, 4, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpoutopen_button.setObjectName("SET_PUMP_OUT_ON")
-
-        self.attachcc_pumpoutclose_button = QtWidgets.QPushButton('关闭排水')
-        self.attachcc_layout.addWidget(self.attachcc_pumpoutclose_button, 5, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.attachcc_pumpoutclose_button.setObjectName("SET_PUMP_OUT_OFF")
-
-        # 云台控制
-        self.gimbalcc_frame = QtWidgets.QFrame()
-        self.gimbalcc_layout = QtWidgets.QGridLayout()
-        self.gimbalcc_frame.setLayout(self.gimbalcc_layout)
-        self.gimbalcc_frame.setFrameShape(QtWidgets.QFrame.Box)
-        self.gimbalcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.gimbalcc_frame.setLineWidth(1)
-        self.console_layout.addWidget(self.gimbalcc_frame, 1, 10, 10, 2)
-
-        self.gimbalcc_fixed_label = QtWidgets.QLabel('云台控制')
-        self.gimbalcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
-        self.gimbalcc_layout.addWidget(self.gimbalcc_fixed_label, 1, 0, 1, 2, QtCore.Qt.AlignCenter)
-
-        self.gimbalcc_start_button = QtWidgets.QPushButton('启动')
-        self.gimbalcc_layout.addWidget(self.gimbalcc_start_button, 2, 0, 1, 2, QtCore.Qt.AlignCenter)
-        self.gimbalcc_start_button.setObjectName("SET_GIMBAL_RUN")
-
-        self.gimbalcc_stop_button = QtWidgets.QPushButton('停止')
-        self.gimbalcc_layout.addWidget(self.gimbalcc_stop_button, 3, 0, 1, 2, QtCore.Qt.AlignCenter)
-        self.gimbalcc_stop_button.setObjectName("SET_GIMBAL_STOP")
-
-        self.gimbalcc_zero_button = QtWidgets.QPushButton('归中')
-        self.gimbalcc_layout.addWidget(self.gimbalcc_zero_button, 4, 0, 1, 2, QtCore.Qt.AlignCenter)
-        self.gimbalcc_zero_button.setObjectName("SET_GIMBAL_ZERO")
-
-
-        # 飞轮控制
-        self.flywheelcc_frame = QtWidgets.QFrame()
-        self.flywheelcc_layout = QtWidgets.QGridLayout()
-        self.flywheelcc_frame.setLayout(self.flywheelcc_layout)
-        self.flywheelcc_frame.setFrameShape(QtWidgets.QFrame.Box)
-        self.flywheelcc_frame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.flywheelcc_frame.setLineWidth(1)
-        self.console_layout.addWidget(self.flywheelcc_frame, 1, 12, 10, 3)
-
-        self.flywheelcc_fixed_label = QtWidgets.QLabel('飞轮控制')
-        self.flywheelcc_fixed_label.setFont(QtGui.QFont('Microsoft YaHei', 15, QtGui.QFont.Bold))
-        self.flywheelcc_layout.addWidget(self.flywheelcc_fixed_label, 1, 0, 1, 3, QtCore.Qt.AlignCenter)
-
-        self.flywheelcc_start_button = QtWidgets.QPushButton('启动')
-        self.flywheelcc_layout.addWidget(self.flywheelcc_start_button, 2, 0, 1, 3, QtCore.Qt.AlignCenter)
-        self.flywheelcc_start_button.setObjectName("SET_FLYWHEEL_RUN")
-
-        self.flywheelcc_stop_button = QtWidgets.QPushButton('停止')
-        self.flywheelcc_layout.addWidget(self.flywheelcc_stop_button, 3, 0, 1, 3, QtCore.Qt.AlignCenter)
-        self.flywheelcc_stop_button.setObjectName("SET_FLYWHEEL_STOP")
 
     # 初始化command shell面板
     def init_cmdshell_panel(self):
@@ -1136,23 +1051,6 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cpgcc_freq_button.clicked.connect(self.console_button_clicked)
         self.cpgcc_offset_button.clicked.connect(self.console_button_clicked)
         self.cpgcc_readparam_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_attach_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_detach_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpopen_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpclose_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpinopen_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpinclose_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpoutopen_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_pumpoutclose_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_v1open_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_v1close_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_v2open_button.clicked.connect(self.console_button_clicked)
-        self.attachcc_v2close_button.clicked.connect(self.console_button_clicked)
-        self.gimbalcc_start_button.clicked.connect(self.console_button_clicked)
-        self.gimbalcc_stop_button.clicked.connect(self.console_button_clicked)
-        self.gimbalcc_zero_button.clicked.connect(self.console_button_clicked)
-        self.flywheelcc_start_button.clicked.connect(self.console_button_clicked)
-        self.flywheelcc_stop_button.clicked.connect(self.console_button_clicked)
         self.serial_shakehand_button.clicked.connect(self.console_button_clicked)
         
 
@@ -2015,73 +1913,73 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.gray)
                 self.swimstate_label.setPalette(pal)
 
-            self.valve1state_label.setAutoFillBackground(True)
+            self.ACBW.valve1state_label.setAutoFillBackground(True)
             if roboremora.valve1_state is remorastate.ValveState.VALVE_OFF:
-                self.valve1state_label.setText('关闭')
+                self.ACBW.valve1state_label.setText('关闭')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.valve1state_label.setPalette(pal)
+                self.ACBW.valve1state_label.setPalette(pal)
             elif roboremora.valve1_state is remorastate.ValveState.VALVE_ON:
-                self.valve1state_label.setText('打开')
+                self.ACBW.valve1state_label.setText('打开')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.valve1state_label.setPalette(pal)
+                self.ACBW.valve1state_label.setPalette(pal)
 
             if roboremora.valve2_state is remorastate.ValveState.VALVE_OFF:
-                self.valve2state_label.setText('关闭')
+                self.ACBW.valve2state_label.setText('关闭')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.valve2state_label.setPalette(pal)
+                self.ACBW.valve2state_label.setPalette(pal)
             elif roboremora.valve2_state is remorastate.ValveState.VALVE_ON:
-                self.valve2state_label.setText('打开')
+                self.ACBW.valve2state_label.setText('打开')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.valve2state_label.setPalette(pal)
+                self.ACBW.valve2state_label.setPalette(pal)
 
             if roboremora.pump_state is remorastate.PumpState.PUMP_OFF:
-                self.pumpstate_label.setText('停止')
+                self.ACBW.pumpstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.pumpstate_label.setPalette(pal)
+                self.ACBW.pumpstate_label.setPalette(pal)
             elif roboremora.pump_state is remorastate.PumpState.PUMP_ON:
-                self.pumpstate_label.setText('运行')
+                self.ACBW.pumpstate_label.setText('运行')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.pumpstate_label.setPalette(pal)
+                self.ACBW.pumpstate_label.setPalette(pal)
 
             if roboremora.pumpin_state is remorastate.PumpState.PUMP_OFF:
-                self.pumpinstate_label.setText('停止')
+                self.ACBW.pumpinstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.pumpinstate_label.setPalette(pal)
+                self.ACBW.pumpinstate_label.setPalette(pal)
             elif roboremora.pumpin_state is remorastate.PumpState.PUMP_ON:
-                self.pumpinstate_label.setText('运行')
+                self.ACBW.pumpinstate_label.setText('运行')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.pumpinstate_label.setPalette(pal)
+                self.ACBW.pumpinstate_label.setPalette(pal)
 
             if roboremora.pumpout_state is remorastate.PumpState.PUMP_OFF:
-                self.pumpoutstate_label.setText('停止')
+                self.ACBW.pumpoutstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.pumpoutstate_label.setPalette(pal)
+                self.ACBW.pumpoutstate_label.setPalette(pal)
             elif roboremora.pumpout_state is remorastate.PumpState.PUMP_ON:
-                self.pumpoutstate_label.setText('运行')
+                self.ACBW.pumpoutstate_label.setText('运行')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.pumpoutstate_label.setPalette(pal)
+                self.ACBW.pumpoutstate_label.setPalette(pal)
 
             if roboremora.gimbal_state is remorastate.GimbalState.GIMBAL_STOP:
-                self.gimbalstate_label.setText('停止')
+                self.GCBW.gimbalstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.gimbalstate_label.setPalette(pal)
+                self.GCBW.gimbalstate_label.setPalette(pal)
             elif roboremora.gimbal_state is remorastate.GimbalState.GIMBAL_RUN:
-                self.gimbalstate_label.setText('运行')
+                self.GCBW.gimbalstate_label.setText('运行')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.gimbalstate_label.setPalette(pal)
+                self.GCBW.gimbalstate_label.setPalette(pal)
             elif roboremora.gimbal_state is remorastate.GimbalState.GIMBAL_ZERO:
-                self.gimbalstate_label.setText('归中')
+                self.GCBW.gimbalstate_label.setText('归中')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.yellow)
-                self.gimbalstate_label.setPalette(pal)
+                self.GCBW.gimbalstate_label.setPalette(pal)
 
             if roboremora.flywheel_state is remorastate.FlywheelState.FLYWHEEL_STOP:
-                self.flywheelstate_label.setText('停止')
+                self.FCBW.flywheelstate_label.setText('停止')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.red)
-                self.flywheelstate_label.setPalette(pal)
+                self.FCBW.flywheelstate_label.setPalette(pal)
             elif roboremora.flywheel_state is remorastate.FlywheelState.FLYWHEEL_RUN:
-                self.flywheelstate_label.setText('运行')
+                self.FCBW.flywheelstate_label.setText('运行')
                 pal.setColor(QtGui.QPalette.WindowText, QtCore.Qt.green)
-                self.flywheelstate_label.setPalette(pal)
+                self.FCBW.flywheelstate_label.setPalette(pal)
             rm_mutex.unlock()
 
         elif rflink.Command(command_id) is rflink.Command.READ_SINE_MOTION_PARAM:
