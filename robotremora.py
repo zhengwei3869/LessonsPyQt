@@ -784,6 +784,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial1_com_combo.addItem('COM10')
         self.serial1_com_combo.addItem('COM11')
         self.serial1_com_combo.addItem('COM12')
+        self.serial1_com_combo.addItem('COM13')
+        self.serial1_com_combo.addItem('COM14')
         self.serial1_com_combo.setFixedSize(120, 30)
         self.serial_layout.addWidget(self.serial1_com_combo, 2, 0, 1, 2, QtCore.Qt.AlignLeft)
 
@@ -831,6 +833,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial2_com_combo.addItem('COM10')
         self.serial2_com_combo.addItem('COM11')
         self.serial2_com_combo.addItem('COM12')
+        self.serial2_com_combo.addItem('COM13')
+        self.serial2_com_combo.addItem('COM14')
         self.serial2_com_combo.setFixedSize(120, 30)
         self.serial_layout.addWidget(self.serial2_com_combo, 4, 0, 1, 2, QtCore.Qt.AlignLeft)
 
