@@ -24,6 +24,7 @@ import childwindows.sendback_btn_win # 回传数据窗口
 import childwindows.attach_control_btn_win # 吸附控制窗口
 import childwindows.gimbal_control_btn_win # 云台控制窗口
 import childwindows.flywheel_control_btn_win # 飞轮控制窗口
+import childwindows.depth_control_btn_win # 飞轮控制窗口
 
 import rflink # Robotic Fish 通讯协议
 import serctl # 串口控制工具
@@ -359,6 +360,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.FCBW.flywheelcc_start_button.clicked.connect(self.console_button_clicked)
         self.FCBW.flywheelcc_stop_button.clicked.connect(self.console_button_clicked)
         self.close_signal.connect(self.FCBW.handle_close)
+
+        ## 深度控制子窗口
+        self.DCBW = childwindows.depth_control_btn_win.DepthControlBtnWin()
+        self.open_depth_control_button.clicked.connect(self.DCBW.handle_click)
+        self.close_signal.connect(self.DCBW.handle_close)
 
         # 绘图部分变量初始化
         self.showtime = 0
