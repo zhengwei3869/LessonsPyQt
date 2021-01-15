@@ -24,7 +24,8 @@ import childwindows.sendback_btn_win # 回传数据窗口
 import childwindows.attach_control_btn_win # 吸附控制窗口
 import childwindows.gimbal_control_btn_win # 云台控制窗口
 import childwindows.flywheel_control_btn_win # 飞轮控制窗口
-import childwindows.depth_control_btn_win # 飞轮控制窗口
+import childwindows.depth_control_btn_win # 深度控制窗口
+import childwindows.multimode_control_btn_win # 多模态控制窗口
 
 import rflink # Robotic Fish 通讯协议
 import serctl # 串口控制工具
@@ -364,8 +365,49 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         ## 深度控制子窗口
         self.DCBW = childwindows.depth_control_btn_win.DepthControlBtnWin()
         self.open_depth_control_button.clicked.connect(self.DCBW.handle_click)
+        self.DCBW.dmctl_both_ballast_button.clicked.connect(self.console_button_clicked)
+        self.DCBW.dmctl_left_ballast_button.clicked.connect(self.console_button_clicked)
+        self.DCBW.dmctl_right_ballast_button.clicked.connect(self.console_button_clicked)
         self.close_signal.connect(self.DCBW.handle_close)
 
+        ## 多模态控制子窗口
+        self.MMCBW = childwindows.multimode_control_btn_win.MultiModeControlBtnWin()
+        self.open_multimode_control_button.clicked.connect(self.MMCBW.handle_click)
+        self.close_signal.connect(self.MMCBW.handle_close)
+        self.MMCBW.multimode_tail_cpgfreq_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_tail_cpgamp_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_tail_cpgoffset_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_tail_oscillate_start_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_tail_oscillate_stop_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_tail_offset_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_set_mode_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_cpgfreq_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_cpgamp_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_cpgoffset_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_oscillate_start_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_oscillate_stop_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pectfin_offset_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_cpgfreq_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_cpgamp_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_cpgoffset_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_oscillate_start_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_oscillate_stop_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftpectfin_offset_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_cpgfreq_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_cpgamp_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_cpgoffset_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_oscillate_start_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_oscillate_stop_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightpectfin_offset_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_ballast_position_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_leftballast_position_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_rightballast_position_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_camera_angle_set_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pumpon_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_pumpoff_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_valveon_button.clicked.connect(self.console_button_clicked)
+        self.MMCBW.multimode_valveoff_button.clicked.connect(self.console_button_clicked)
+        
         # 绘图部分变量初始化
         self.showtime = 0
         self.timelist = [] # x轴数据,时间
@@ -382,6 +424,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         # 保存数据的文件名
         self.savefile_name = "data.bin"
 
+        self.moveFlag = False
+
     #####################################################################################################
     #####################################################################################################
     ## 第一部分:关于UI定义
@@ -394,10 +438,18 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         :return:
         """
         self.init_layout()
-        self.statusBar().showMessage('串口未打开')
+        # self.statusBar().showMessage('串口未打开')
+        self.show_message('串口未打开')
         self.setFixedSize(1640, 800)# 设置窗体大小
         self.setWindowTitle('Robot Remora')  # 设置窗口标题
         self.setWindowIcon(QtGui.QIcon('icon/my/fish.png'))
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.effect_shadow = QtWidgets.QGraphicsDropShadowEffect(self)
+        self.effect_shadow.setOffset(5, 5) # 偏移
+        self.effect_shadow.setBlurRadius(20) # 阴影半径
+        self.effect_shadow.setColor(QtCore.Qt.black) # 阴影颜色
+        self.main_widget.setGraphicsEffect(self.effect_shadow) # 将设置套用到widget窗口中
         self.show()  # 窗口显示
 
     # 初始化layout界面
@@ -411,11 +463,18 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.cmdshell_frame:指令shell区
         :return:
         """
+        self.base_widget = QtWidgets.QWidget() # 创建透明窗口
+        self.base_layout = QtWidgets.QGridLayout()
+        self.base_widget.setLayout(self.base_layout)
+        self.base_widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.main_widget = QtWidgets.QWidget()
         self.main_widget.setObjectName('main_widget')
         self.main_layout = QtWidgets.QGridLayout()
         self.main_widget.setLayout(self.main_layout)
+
+        self.base_layout.addWidget(self.main_widget) 
+        self.setCentralWidget(self.base_widget) # 设置窗口主部件
 
         # 状态显示区
         self.stateshow_frame = QtWidgets.QFrame()
@@ -456,8 +515,6 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.main_layout.addWidget(self.datashow_frame, 0, 2, 8, 13)
         self.main_layout.addWidget(self.console_frame, 8, 0, 5, 15)
         self.main_layout.addWidget(self.cmdshell_frame, 0, 16, 13, 10)
-
-        self.setCentralWidget(self.main_widget)  # 设置窗口主部件
 
         self.init_stateshow_panel()
         self.init_console_panel()
@@ -767,6 +824,10 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.open_targettracking_control_button = QtWidgets.QPushButton('跟踪控制')
         self.advancedcc_layout.addWidget(self.open_targettracking_control_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.open_targettracking_control_button.setFixedSize(100, button_height)
+        # 跟踪控制按钮
+        self.open_multimode_control_button = QtWidgets.QPushButton('多模态控制')
+        self.advancedcc_layout.addWidget(self.open_multimode_control_button, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
+        self.open_multimode_control_button.setFixedSize(100, button_height)
 
     # 初始化command shell面板
     def init_cmdshell_panel(self):
@@ -1176,24 +1237,89 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         :return:
         """
         sender_button = self.sender()
+        cmd = rflink.Command[sender_button.objectName()].value
         if rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_AMP:
             data = (self.cpgcc_amp_edit.text()).encode('ascii')
         elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_FREQ:
             data = (self.cpgcc_freq_edit.text()).encode('ascii')
         elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_OFFSET:
             data = (self.cpgcc_offset_edit.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_GIMBAL_ANGLE:
+            data = self.GCBW.gimbalcc_servo_angle_slider.value()
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_TAIL_CPG_FREQ:
+            data = (self.MMCBW.multimode_tail_cpgfreq_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_TAIL_CPG_AMP:
+            data = (self.MMCBW.multimode_tail_cpgamp_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_TAIL_CPG_OFFSET:
+            data = (self.MMCBW.multimode_tail_cpgoffset_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_TAIL_ANGLE:
+            data = self.MMCBW.multimode_tail_offset_slider.value() + 90
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_PECTFIN_MODE:
+            if self.MMCBW.pectfin_motion_mode == 0:
+                cmd = rflink.Command.SET_PECTFIN_FORWARD_MODE.value
+            elif self.MMCBW.pectfin_motion_mode == 1:
+                cmd = rflink.Command.SET_PECTFIN_BACKWARD_MODE.value
+            elif self.MMCBW.pectfin_motion_mode == 2:
+                cmd = rflink.Command.SET_PECTFIN_UPWARD_MODE.value
+            elif self.MMCBW.pectfin_motion_mode == 3:
+                cmd = rflink.Command.SET_PECTFIN_LEFTSTEER_MODE.value
+            elif self.MMCBW.pectfin_motion_mode == 4:
+                cmd = rflink.Command.SET_PECTFIN_RIGHTSTEER_MODE.value
+            data = 0
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_PECTFIN_CPG_FREQ:
+            data = (self.MMCBW.multimode_pectfin_cpgfreq_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_PECTFIN_CPG_AMP:
+            data = (self.MMCBW.multimode_pectfin_cpgamp_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_PECTFIN_CPG_OFFSET:
+            data = (self.MMCBW.multimode_pectfin_cpgoffset_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_PECTFIN_ANGLE:
+            data = self.MMCBW.multimode_pectfin_offset_slider.value() + 90
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_LEFTPECTFIN_CPG_FREQ:
+            data = (self.MMCBW.multimode_leftpectfin_cpgfreq_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_LEFTPECTFIN_CPG_AMP:
+            data = (self.MMCBW.multimode_leftpectfin_cpgamp_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_LEFTPECTFIN_CPG_OFFSET:
+            data = (self.MMCBW.multimode_leftpectfin_cpgoffset_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_LEFTPECTFIN_ANGLE:
+            data = self.MMCBW.multimode_leftpectfin_offset_slider.value() + 90
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_RIGHTPECTFIN_CPG_FREQ:
+            data = (self.MMCBW.multimode_rightpectfin_cpgfreq_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_RIGHTPECTFIN_CPG_AMP:
+            data = (self.MMCBW.multimode_rightpectfin_cpgamp_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_RIGHTPECTFIN_CPG_OFFSET:
+            data = (self.MMCBW.multimode_rightpectfin_cpgoffset_editor.text()).encode('ascii')
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_RIGHTPECTFIN_ANGLE:
+            data = self.MMCBW.multimode_rightpectfin_offset_slider.value() + 90
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_BALLAST_POS:
+            data = self.MMCBW.multimode_ballast_position_slider.value() + 15
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_LEFTBALLAST_POS:
+            data = self.MMCBW.multimode_leftballast_position_slider.value() + 15
+            data = data.to_bytes(1, byteorder='big', signed=False)
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_RIGHTBALLAST_POS:
+            data = self.MMCBW.multimode_rightballast_position_slider.value() + 15
+            data = data.to_bytes(1, byteorder='big', signed=False)   
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_CAMERA_ANGLE:
+            data = self.MMCBW.multimode_camera_angle_slider.value() + 90
+            data = data.to_bytes(1, byteorder='big', signed=False)
         else:
             data = 0
 
         # 数据打包
-        datapack = rftool.RFLink_packdata(rflink.Command[sender_button.objectName()].value, data)
+        datapack = rftool.RFLink_packdata(cmd, data)
 
         # 数据发送
         with QtCore.QMutexLocker(ser_mutex):
             try:
                 send_sertool.write_cmd(datapack)
             except serial.serialutil.SerialException:
-                self.statusBar().showMessage('串口未打开,无法发送')
+                # self.statusBar().showMessage('串口未打开,无法发送')
+                self.show_message('串口未打开,无法发送')
 
     # Command Shell后端函数
     def command_shell_backstage(self):
@@ -1309,7 +1435,15 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                         self.cmdshell_text_browser.append(
                             "<font color='DarkOrange'>Usage&nbsp;:&nbsp;SET_FLYWHEEL_CMD&nbsp;[char]</font>")
                         return
-
+                # 如果是设置左右胸鳍PWM
+                elif rflink.Command[cmd] is rflink.Command.SET_LEFTPECTFIN_PWM \
+                    or rflink.Command[cmd] is rflink.Command.SET_RIGHTPECTFIN_PWM \
+                    or rflink.Command[cmd] is rflink.Command.SET_CAMERA_PWM \
+                    or rflink.Command[cmd] is rflink.Command.SET_LEFTBALLAST_PWM \
+                    or rflink.Command[cmd] is rflink.Command.SET_RIGHTBALLAST_PWM:
+                    data = int(instrlist[1])
+                    data = data.to_bytes(2, byteorder='big', signed=False)
+                    print(data)
                 # 打包成数据包,发送给下位机
                 datapack = rftool.RFLink_packdata(rflink.Command[cmd].value, data)
 
@@ -1345,7 +1479,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                 elif self.datashow_sensor_datatype == 3:
                     cmdvalue = rflink.Command["READ_IMU1_GYRO"].value
                 else:
-                    self.statusBar().showMessage('未选定需要显示的数据')
+                    # self.statusBar().showMessage('未选定需要显示的数据')
+                    self.show_message('未选定需要显示的数据')
                     return
             elif self.datashow_sensor_id == 2: # IMU2
                 if self.datashow_sensor_datatype == 1:
@@ -1355,10 +1490,12 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                 elif self.datashow_sensor_datatype == 3:
                     cmdvalue = rflink.Command["READ_IMU2_GYRO"].value
                 else:
-                    self.statusBar().showMessage('未选定需要显示的数据')
+                    # self.statusBar().showMessage('未选定需要显示的数据')
+                    self.show_message('未选定需要显示的数据')
                     return
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
 
             # 判断数据的轴向
@@ -1369,7 +1506,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             elif self.datashow_sensor_dataaxis == 3:
                 data = 3
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
 
         ### 压敏电阻
@@ -1379,7 +1517,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             elif self.datashow_sensor_id == 2:
                 cmdvalue = rflink.Command["READ_VARISTOR2_VAL"].value
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
 
         ### 云台角度传感器
@@ -1389,7 +1528,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             elif self.datashow_sensor_id == 2:
                 cmdvalue = rflink.Command["READ_GIMBAL2_ANGLE"].value
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
 
         ### 飞轮编码器
@@ -1399,7 +1539,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             elif self.datashow_sensor_id == 2:
                 cmdvalue = rflink.Command["READ_FLYWHEEL_VEL"].value
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
         
         ### 深度传感器
@@ -1407,10 +1548,12 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             if self.datashow_sensor_id == 1:
                 cmdvalue = rflink.Command["READ_DEPTH"].value
             else:
-                self.statusBar().showMessage('未选定需要显示的数据')
+                # self.statusBar().showMessage('未选定需要显示的数据')
+                self.show_message('未选定需要显示的数据')
                 return
         else:
-            self.statusBar().showMessage('未选定需要显示的数据')
+            # self.statusBar().showMessage('未选定需要显示的数据')
+            self.show_message('未选定需要显示的数据')
             return
 
         # 发送信号
@@ -1419,7 +1562,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             try:
                 send_sertool.write_cmd(datapack)
             except serial.serialutil.SerialException:
-                self.statusBar().showMessage('串口未打开,无法发送')
+                # self.statusBar().showMessage('串口未打开,无法发送')
+                self.show_message('串口未打开,无法发送')
                 return
         self.datashow_running_flag = True
         ## 一旦开始显示数据,全部checkbox都会停止
@@ -1456,7 +1600,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             try:
                 send_sertool.write_cmd(datapack)
             except serial.serialutil.SerialException:
-                self.statusBar().showMessage('串口未打开,无法发送')
+                # self.statusBar().showMessage('串口未打开,无法发送')
+                self.show_message('串口未打开,无法发送')
                 return
         self.datashow_running_flag = False
 
@@ -1501,7 +1646,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
     def datashow_save_button_clicked(self, filename):
         if self.datashow_running_flag == True:
-            self.statusBar().showMessage('停止显示后,方可回传数据')
+            # self.statusBar().showMessage('停止显示后,方可回传数据')
+            self.show_message('停止显示后,方可回传数据')
             self.SBBW.set_lineeditor_text('停止显示后,方可回传数据')
             return
         self.savefile_name = filename
@@ -1510,7 +1656,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             try:
                 send_sertool.write_cmd(datapack)
             except serial.serialutil.SerialException:
-                self.statusBar().showMessage('串口未打开,无法发送')
+                # self.statusBar().showMessage('串口未打开,无法发送')
+                self.show_message('串口未打开,无法发送')
                 self.SBBW.set_lineeditor_text('串口未打开,无法发送')
             
 
@@ -1519,9 +1666,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         with QtCore.QMutexLocker(ser_mutex):
             try:
                 send_sertool.write_cmd(datapack)
-                self.statusBar().showMessage('数据已开始储存')
+                # self.statusBar().showMessage('数据已开始储存')
+                self.show_message('数据已开始储存')
             except serial.serialutil.SerialException:
-                self.statusBar().showMessage('串口未打开,无法发送')
+                # self.statusBar().showMessage('串口未打开,无法发送')
+                self.show_message('串口未打开,无法发送')
 
     # 有关串口开关的一系列按钮
     def serial1_open_button_clicked(self):
@@ -1539,9 +1688,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         baud = int(self.serial1_bps_combo.currentText())
         try:
             send_sertool.init_serial(port,baud)
-            self.statusBar().showMessage('发送串口已开启')
+            # self.statusBar().showMessage('发送串口已开启')
+            self.show_message('发送串口已开启')
         except serial.serialutil.SerialException:
-            self.statusBar().showMessage('该串口不存在')
+            # self.statusBar().showMessage('该串口不存在')
+            self.show_message('该串口不存在')
 
     def serial1_close_button_clicked(self):
         """
@@ -1550,7 +1701,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         """
         self.polling_state_thread.pause()
         send_sertool.close_serial()
-        self.statusBar().showMessage('发送串口已关闭')
+        # self.statusBar().showMessage('发送串口已关闭')
+        self.show_message('发送串口已关闭')
 
     def serial2_open_button_clicked(self):
         """
@@ -1578,9 +1730,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             else:
                 self.analysis_data_thread.resume()
 
-            self.statusBar().showMessage('接收串口已开启')
+            # self.statusBar().showMessage('接收串口已开启')
+            self.show_message('接收串口已开启')
         except serial.serialutil.SerialException:
-            self.statusBar().showMessage('该串口不存在')
+            # self.statusBar().showMessage('该串口不存在')
+            self.show_message('该串口不存在')
 
     def serial2_close_button_clicked(self):
         """
@@ -1590,7 +1744,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.receive_data_thread.pause()
         self.analysis_data_thread.pause()
         recv_sertool.close_serial()
-        self.statusBar().showMessage('接收串口已关闭')
+        # self.statusBar().showMessage('接收串口已关闭')
+        self.show_message('接收串口已关闭')
 
     # 有关Check box 配置的一系列槽函数
     ## IMU部分
@@ -2150,7 +2305,25 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         QtWidgets.QApplication.processEvents()
 
+    def show_message(self, print_string):
+        print_string = "系统提示：" + print_string
+        self.cmdshell_text_browser.append(print_string)
 
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.moveFlag = True
+            self.movePosition = event.globalPos() - self.pos()
+            # self.setCursor(QtGui.QCursor(QtCore.Qt.OpenHandCursor))
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if QtCore.Qt.LeftButton and self.moveFlag:
+            self.move(event.globalPos() - self.movePosition)
+            event.accept()
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        self.moveFlag = False
+        # self.setCursor(QtCore.Qt.CrossCursor)
 
 if __name__ == '__main__':
 
@@ -2159,7 +2332,7 @@ if __name__ == '__main__':
     RRW = RobotRemoraWindow()  # 创建窗体对象
     
     # 美化窗体对象
-    with open('roboremora.qss') as f:
+    with open('qss/roboremora.qss') as f:
         qss = f.read()
     RRW.setStyleSheet(qss)
 

@@ -1,0 +1,62 @@
+/* QWidget */
+QWidget#gimbal_control_window{
+    /* background-image: url('background.png'); */
+    background-color: #7ecdc7;
+}
+
+/* QLabel */
+QLabel{color:#FFE882;}
+QLabel{
+    font-family:"Microsoft YaHei";
+    font-size: 10pt;
+    font-weight: bold;
+}
+QLabel#gimbal_status_fixed_label, QLabel#gimbal_control_fixed_label{
+    color: #e39d22;
+    font-family:"Microsoft YaHei";
+    font-size: 16pt;
+    font-weight: bold;
+}
+QLabel#gimbalstate_fixed_label, QLabel#gimbalstate_label{
+    font-family:"Microsoft YaHei";
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+/* QPushButton */
+QPushButton{
+    background-color: #41807C;
+    color:#FFE882;
+    font-family:"Microsoft YaHei";
+    font-size: 16;
+    font-weight: bold;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: #0D3D42;
+}
+QPushButton:hover{
+    background-color: #CC91C3;
+}
+
+/* QSlider */
+QSlider{
+    border: none;
+    background-color: transparent;
+    border-radius: 8px;
+}
+QSlider::handle:horizontal{
+    background-color: #e39d22;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 10px;
+}
+QSlider::groove:horizontal{
+    background-color: #FFE882;
+    border-radius: 10px;
+}
+QSlider::sub-page:horizontal{
+    border-radius: 10px;
+    background-color: #E6B573;
+}

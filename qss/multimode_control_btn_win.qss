@@ -1,0 +1,5 @@
+QLabel#tail_mode_label, QLabel#pectfin_mode_label, QLabel#ballast_mode_label, QLabel#camera_mode_label, QLabel#adhesive_mode_label{
+    font-family:"Microsoft YaHei";
+    font-size: 10pt;
+    font-weight: bold;
+}
