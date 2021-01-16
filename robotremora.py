@@ -424,7 +424,9 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         # 保存数据的文件名
         self.savefile_name = "data.bin"
 
+        # 鼠标和键盘响应配置
         self.moveFlag = False
+        self.setFocusPolicy(QtCore.Qt.StrongFocus) # 方便键盘响应到方向键
 
     #####################################################################################################
     #####################################################################################################
@@ -610,100 +612,116 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.swimcc_fixed_label.setObjectName('swimcc_fixed_label')
         self.swimcc_layout.addWidget(self.swimcc_fixed_label, 1, 0, 1, 4, QtCore.Qt.AlignCenter)
 
-        self.swimcc_start_button = QtWidgets.QPushButton('启动(q)')
+        # self.swimcc_start_button = QtWidgets.QPushButton('启动(q)')
+        self.swimcc_start_button = QtWidgets.QPushButton('启动')
         self.swimcc_layout.addWidget(self.swimcc_start_button, 2, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_start_button.setObjectName("SET_SWIM_RUN")
-        self.swimcc_start_button.setShortcut('q')
+        # self.swimcc_start_button.setShortcut('q')
         self.swimcc_start_button.setFixedSize(110, button_height)
 
-        self.swimcc_stop_button = QtWidgets.QPushButton('暂停(w)')
+        # self.swimcc_stop_button = QtWidgets.QPushButton('暂停(w)')
+        self.swimcc_stop_button = QtWidgets.QPushButton('暂停')
         self.swimcc_layout.addWidget(self.swimcc_stop_button, 2, 1, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_stop_button.setObjectName("SET_SWIM_STOP")
-        self.swimcc_stop_button.setShortcut('w')
+        # self.swimcc_stop_button.setShortcut('w')
         self.swimcc_stop_button.setFixedSize(110, button_height)
 
-        self.swimcc_forcestop_button = QtWidgets.QPushButton('停止(e)')
+        # self.swimcc_forcestop_button = QtWidgets.QPushButton('停止(e)')
+        self.swimcc_forcestop_button = QtWidgets.QPushButton('停止')
         self.swimcc_layout.addWidget(self.swimcc_forcestop_button, 2, 2, 1,  1, QtCore.Qt.AlignCenter)
         self.swimcc_forcestop_button.setObjectName("SET_SWIM_FORCESTOP")
-        self.swimcc_forcestop_button.setShortcut('e')
+        # self.swimcc_forcestop_button.setShortcut('e')
         self.swimcc_forcestop_button.setFixedSize(110, button_height)
 
-        self.swimcc_turnleft_button = QtWidgets.QPushButton('左转(a)')
+        # self.swimcc_turnleft_button = QtWidgets.QPushButton('左转(a)')
+        self.swimcc_turnleft_button = QtWidgets.QPushButton('左转')
         self.swimcc_layout.addWidget(self.swimcc_turnleft_button, 3, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_turnleft_button.setObjectName("SET_SWIM_LEFT")
-        self.swimcc_turnleft_button.setShortcut('a')
+        # self.swimcc_turnleft_button.setShortcut('a')
         self.swimcc_turnleft_button.setFixedSize(110, button_height)
 
-        self.swimcc_straight_button = QtWidgets.QPushButton('直游(s)')
+        # self.swimcc_straight_button = QtWidgets.QPushButton('直游(s)')
+        self.swimcc_straight_button = QtWidgets.QPushButton('直游')
         self.swimcc_layout.addWidget(self.swimcc_straight_button, 3, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_straight_button.setObjectName("SET_SWIM_STRAIGHT")
-        self.swimcc_straight_button.setShortcut('s')
+        self.swimcc_straight_button.setObjectName("SET_SWIM_FORWARD")
+        # self.swimcc_straight_button.setShortcut('s')
         self.swimcc_straight_button.setFixedSize(110, button_height)
 
-        self.swimcc_turnright_button = QtWidgets.QPushButton('右转(d)')
+        # self.swimcc_turnright_button = QtWidgets.QPushButton('右转(d)')
+        self.swimcc_turnright_button = QtWidgets.QPushButton('右转')
         self.swimcc_layout.addWidget(self.swimcc_turnright_button, 3, 2, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_turnright_button.setObjectName("SET_SWIM_RIGHT")
-        self.swimcc_turnright_button.setShortcut('d')
+        # self.swimcc_turnright_button.setShortcut('d')
         self.swimcc_turnright_button.setFixedSize(110, button_height)
 
-        self.swimcc_speedup_button = QtWidgets.QPushButton('加速(z)')
+        # self.swimcc_speedup_button = QtWidgets.QPushButton('加速(z)')
+        self.swimcc_speedup_button = QtWidgets.QPushButton('加速')
         self.swimcc_layout.addWidget(self.swimcc_speedup_button, 4, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_speedup_button.setObjectName("SET_SWIM_SPEEDUP")
-        self.swimcc_speedup_button.setShortcut('z')
+        # self.swimcc_speedup_button.setShortcut('z')
         self.swimcc_speedup_button.setFixedSize(110, button_height)
 
-        self.swimcc_speeddown_button = QtWidgets.QPushButton('减速(x)')
+        # self.swimcc_speeddown_button = QtWidgets.QPushButton('减速(x)')
+        self.swimcc_speeddown_button = QtWidgets.QPushButton('减速')
         self.swimcc_layout.addWidget(self.swimcc_speeddown_button, 5, 0, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_speeddown_button.setObjectName("SET_SWIM_SPEEDDOWN")
-        self.swimcc_speeddown_button.setShortcut('x')
+        # self.swimcc_speeddown_button.setShortcut('x')
         self.swimcc_speeddown_button.setFixedSize(110, button_height)
 
-        self.swimcc_raise_button = QtWidgets.QPushButton('上浮(↑)')
+        # self.swimcc_raise_button = QtWidgets.QPushButton('上浮(↑)')
+        self.swimcc_raise_button = QtWidgets.QPushButton('上浮')
         self.swimcc_layout.addWidget(self.swimcc_raise_button, 2, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_raise_button.setObjectName("SET_SWIM_UP")
-        self.swimcc_raise_button.setShortcut(QtCore.Qt.Key_Up)
+        # self.swimcc_raise_button.setShortcut(QtCore.Qt.Key_Up)
         self.swimcc_raise_button.setFixedSize(110, button_height)
 
-        self.swimcc_dive_button = QtWidgets.QPushButton('下潜(↓)')
+        # self.swimcc_dive_button = QtWidgets.QPushButton('下潜(↓)')
+        self.swimcc_dive_button = QtWidgets.QPushButton('下潜')
         self.swimcc_layout.addWidget(self.swimcc_dive_button, 3, 3, 1, 1, QtCore.Qt.AlignCenter)
         self.swimcc_dive_button.setObjectName("SET_SWIM_DOWN")
-        self.swimcc_dive_button.setShortcut(QtCore.Qt.Key_Down)
+        # self.swimcc_dive_button.setShortcut(QtCore.Qt.Key_Down)
         self.swimcc_dive_button.setFixedSize(110, button_height)
 
-        self.swimcc_leftfinzero_button = QtWidgets.QPushButton('左胸鳍回中(i)')
+        # self.swimcc_leftfinzero_button = QtWidgets.QPushButton('左胸鳍回中(i)')
+        self.swimcc_leftfinzero_button = QtWidgets.QPushButton('左胸鳍回中')
         self.swimcc_layout.addWidget(self.swimcc_leftfinzero_button, 4, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_leftfinzero_button.setObjectName("SET_LEFTPECFIN_ZERO")
-        self.swimcc_leftfinzero_button.setShortcut('i')
+        self.swimcc_leftfinzero_button.setObjectName("SET_LEFTPECTFIN_ANGLE_ZERO")
+        # self.swimcc_leftfinzero_button.setShortcut('i')
         self.swimcc_leftfinzero_button.setFixedSize(110, button_height)
 
-        self.swimcc_rightfinzero_button = QtWidgets.QPushButton('右胸鳍回中(k)')
+        # self.swimcc_rightfinzero_button = QtWidgets.QPushButton('右胸鳍回中(k)')
+        self.swimcc_rightfinzero_button = QtWidgets.QPushButton('右胸鳍回中')
         self.swimcc_layout.addWidget(self.swimcc_rightfinzero_button, 5, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_rightfinzero_button.setObjectName("SET_RIGHTPECFIN_ZERO")
-        self.swimcc_rightfinzero_button.setShortcut('k')
+        self.swimcc_rightfinzero_button.setObjectName("SET_RIGHTPECTFIN_ANGLE_ZERO")
+        # self.swimcc_rightfinzero_button.setShortcut('k')
         self.swimcc_rightfinzero_button.setFixedSize(110, button_height)
 
-        self.swimcc_leftfinup_button = QtWidgets.QPushButton('左胸鳍+(u)')
+        # self.swimcc_leftfinup_button = QtWidgets.QPushButton('左胸鳍+(u)')
+        self.swimcc_leftfinup_button = QtWidgets.QPushButton('左胸鳍+')
         self.swimcc_layout.addWidget(self.swimcc_leftfinup_button, 4, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_leftfinup_button.setObjectName("SET_LEFTPECFIN_UP")
-        self.swimcc_leftfinup_button.setShortcut('u')
+        self.swimcc_leftfinup_button.setObjectName("SET_LEFTPECTFIN_ANGLE_ADD")
+        # self.swimcc_leftfinup_button.setShortcut('u')
         self.swimcc_leftfinup_button.setFixedSize(110, button_height)
 
-        self.swimcc_leftfindown_button = QtWidgets.QPushButton('左胸鳍-(o)')
+        # self.swimcc_leftfindown_button = QtWidgets.QPushButton('左胸鳍-(o)')
+        self.swimcc_leftfindown_button = QtWidgets.QPushButton('左胸鳍-')
         self.swimcc_layout.addWidget(self.swimcc_leftfindown_button, 4, 3, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_leftfindown_button.setObjectName("SET_LEFTPECFIN_DOWN")
-        self.swimcc_leftfindown_button.setShortcut('o')
+        self.swimcc_leftfindown_button.setObjectName("SET_LEFTPECTFIN_ANGLE_ABATE")
+        # self.swimcc_leftfindown_button.setShortcut('o')
         self.swimcc_leftfindown_button.setFixedSize(110, button_height)
 
-        self.swimcc_rightfinup_button = QtWidgets.QPushButton('右胸鳍+(j)')
+        # self.swimcc_rightfinup_button = QtWidgets.QPushButton('右胸鳍+(j)')
+        self.swimcc_rightfinup_button = QtWidgets.QPushButton('右胸鳍+')
         self.swimcc_layout.addWidget(self.swimcc_rightfinup_button, 5, 1, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_rightfinup_button.setObjectName("SET_RIGHTPECFIN_UP")
-        self.swimcc_rightfinup_button.setShortcut('j')
+        self.swimcc_rightfinup_button.setObjectName("SET_RIGHTPECTFIN_ANGLE_ADD")
+        # self.swimcc_rightfinup_button.setShortcut('j')
         self.swimcc_rightfinup_button.setFixedSize(110, button_height)
 
-        self.swimcc_rightfindown_button = QtWidgets.QPushButton('右胸鳍-(l)')
+        # self.swimcc_rightfindown_button = QtWidgets.QPushButton('右胸鳍-(l)')
+        self.swimcc_rightfindown_button = QtWidgets.QPushButton('右胸鳍-')
         self.swimcc_layout.addWidget(self.swimcc_rightfindown_button, 5, 3, 1, 1, QtCore.Qt.AlignCenter)
-        self.swimcc_rightfindown_button.setObjectName("SET_RIGHTPECFIN_DOWN")
-        self.swimcc_rightfindown_button.setShortcut('l')
+        self.swimcc_rightfindown_button.setObjectName("SET_RIGHTPECTFIN_ANGLE_ABATE")
+        # self.swimcc_rightfindown_button.setShortcut('l')
         self.swimcc_rightfindown_button.setFixedSize(110, button_height)
 
         # CPG参数设置
@@ -734,7 +752,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_amp_button = QtWidgets.QPushButton('写入')
         self.cpgcc_layout.addWidget(self.cpgcc_amp_button, 2, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.cpgcc_amp_button.setObjectName("SET_SINE_MOTION_AMP")
+        self.cpgcc_amp_button.setObjectName("SET_SWIM_CPG_AMP")
         self.cpgcc_amp_button.setFixedSize(60, button_height)
 
         self.cpgcc_freq_label = QtWidgets.QLabel('频率')
@@ -754,7 +772,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_freq_button = QtWidgets.QPushButton('写入')
         self.cpgcc_layout.addWidget(self.cpgcc_freq_button, 3, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.cpgcc_freq_button.setObjectName("SET_SINE_MOTION_FREQ")
+        self.cpgcc_freq_button.setObjectName("SET_SWIM_CPG_FREQ")
         self.cpgcc_freq_button.setFixedSize(60, button_height)
 
         self.cpgcc_offset_label = QtWidgets.QLabel('偏移')
@@ -774,13 +792,14 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
 
         self.cpgcc_offset_button = QtWidgets.QPushButton('写入')
         self.cpgcc_layout.addWidget(self.cpgcc_offset_button, 4, 2, 1, 1, QtCore.Qt.AlignCenter)
-        self.cpgcc_offset_button.setObjectName("SET_SINE_MOTION_OFFSET")
+        self.cpgcc_offset_button.setObjectName("SET_SWIM_CPG_OFFSET")
         self.cpgcc_offset_button.setFixedSize(60, button_height)
 
-        self.cpgcc_readparam_button = QtWidgets.QPushButton('读取参数(r)')
+        # self.cpgcc_readparam_button = QtWidgets.QPushButton('读取参数(r)')
+        self.cpgcc_readparam_button = QtWidgets.QPushButton('读取参数')
         self.cpgcc_layout.addWidget(self.cpgcc_readparam_button, 5, 0, 1, 3, QtCore.Qt.AlignCenter)
         self.cpgcc_readparam_button.setObjectName("READ_SINE_MOTION_PARAM")
-        self.cpgcc_readparam_button.setShortcut('r')
+        # self.cpgcc_readparam_button.setShortcut('r')
         self.cpgcc_readparam_button.setFixedSize(180, button_height)
 
         # 高级控制选项
@@ -1238,11 +1257,11 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         """
         sender_button = self.sender()
         cmd = rflink.Command[sender_button.objectName()].value
-        if rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_AMP:
+        if rflink.Command[sender_button.objectName()] is rflink.Command.SET_SWIM_CPG_AMP:
             data = (self.cpgcc_amp_edit.text()).encode('ascii')
-        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_FREQ:
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SWIM_CPG_FREQ:
             data = (self.cpgcc_freq_edit.text()).encode('ascii')
-        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SINE_MOTION_OFFSET:
+        elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_SWIM_CPG_OFFSET:
             data = (self.cpgcc_offset_edit.text()).encode('ascii')
         elif rflink.Command[sender_button.objectName()] is rflink.Command.SET_GIMBAL_ANGLE:
             data = self.GCBW.gimbalcc_servo_angle_slider.value()
@@ -1443,7 +1462,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                     or rflink.Command[cmd] is rflink.Command.SET_RIGHTBALLAST_PWM:
                     data = int(instrlist[1])
                     data = data.to_bytes(2, byteorder='big', signed=False)
-                    print(data)
+                    # print(data)
                 # 打包成数据包,发送给下位机
                 datapack = rftool.RFLink_packdata(rflink.Command[cmd].value, data)
 
@@ -2324,6 +2343,167 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
     def mouseReleaseEvent(self, QMouseEvent):
         self.moveFlag = False
         # self.setCursor(QtCore.Qt.CrossCursor)
+
+    def keyPressEvent(self, event):
+        cmd = None
+        if(event.key() == QtCore.Qt.Key_A):
+            self.show_message("尾鳍向左游")
+            cmd = rflink.Command.SET_SWIM_LEFT.value
+        elif(event.key() == QtCore.Qt.Key_D):
+            self.show_message("尾鳍向右游")
+            cmd = rflink.Command.SET_SWIM_RIGHT.value
+        elif(event.key() == QtCore.Qt.Key_W):
+            self.show_message("向前游")
+            cmd = rflink.Command.SET_SWIM_FORWARD.value
+        elif(event.key() == QtCore.Qt.Key_S):
+            self.show_message("向后游")
+            cmd = rflink.Command.SET_SWIM_BACKWARD.value
+        elif(event.key() == QtCore.Qt.Key_Up):
+            self.show_message("上浮，深度控制")
+            cmd = rflink.Command.SET_SWIM_UP.value
+        elif(event.key() == QtCore.Qt.Key_Down):
+            self.show_message("下潜，深度控制")
+            cmd = rflink.Command.SET_SWIM_DOWN.value
+        elif(event.key() == QtCore.Qt.Key_Left):
+            self.show_message("向左，胸鳍向左")
+            cmd = rflink.Command.SET_SWIM_LEFT_BYPF.value
+        elif(event.key() == QtCore.Qt.Key_Right):
+            self.show_message("向右，胸鳍向右")
+            cmd = rflink.Command.SET_SWIM_RIGHT_BYPF.value
+        elif(event.key() == QtCore.Qt.Key_J):
+            self.show_message("吸附")
+            cmd = rflink.Command.GOTO_ATTACH.value
+        elif(event.key() == QtCore.Qt.Key_K):
+            self.show_message("脱附")
+            cmd = rflink.Command.GOTO_DETACH.value
+        elif(event.key() == QtCore.Qt.Key_0 or event.key() == QtCore.Qt.Key_ParenRight):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("尾鳍启动，进入摆动模态")
+                cmd = rflink.Command.SET_TAIL_RUN.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("尾鳍加速")
+                cmd = rflink.Command.SET_TAIL_SPEEDUP.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("尾鳍减速")
+                cmd = rflink.Command.SET_TAIL_SPEEDDOWN.value
+            else:
+                self.show_message("尾鳍停止")
+                cmd = rflink.Command.SET_TAIL_STOP.value
+        elif(event.key() == QtCore.Qt.Key_1 or event.key() == QtCore.Qt.Key_Exclam):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("左胸鳍启动，进入摆动模态")
+                cmd = rflink.Command.SET_LEFTPECTFIN_RUN.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("左胸鳍加速")
+                cmd = rflink.Command.SET_LEFTPECTFIN_SPEEDUP.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("左胸鳍减速")
+                cmd = rflink.Command.SET_LEFTPECTFIN_SPEEDDOWN.value
+            else:
+                self.show_message("左胸鳍停止")
+                cmd = rflink.Command.SET_LEFTPECTFIN_STOP.value
+        elif(event.key() == QtCore.Qt.Key_2 or event.key() == QtCore.Qt.Key_At):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("右胸鳍启动，进入摆动模态")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_RUN.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("右胸鳍加速")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_SPEEDUP.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("右胸鳍减速")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_SPEEDDOWN.value
+            else:
+                self.show_message("右胸鳍停止")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_STOP.value
+        elif(event.key() == QtCore.Qt.Key_3 or event.key() == QtCore.Qt.Key_NumberSign):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("胸鳍启动，进入摆动模态")
+                cmd = rflink.Command.SET_PECTFIN_RUN.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("胸鳍加速")
+                cmd = rflink.Command.SET_PECTFIN_SPEEDUP.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("胸鳍减速")
+                cmd = rflink.Command.SET_PECTFIN_SPEEDDOWN.value
+            else:
+                self.show_message("胸鳍停止")
+                cmd = rflink.Command.SET_PECTFIN_STOP.value
+        elif(event.key() == QtCore.Qt.Key_4 or event.key() == QtCore.Qt.Key_Dollar):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("尾鳍归中")
+                cmd = rflink.Command.SET_TAIL_ANGLE_ZERO.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("尾鳍角度加大")
+                cmd = rflink.Command.SET_TAIL_ANGLE_ADD.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("尾鳍角度减小")
+                cmd = rflink.Command.SET_TAIL_ANGLE_ABATE.value
+            else:
+                self.show_message("尾鳍归中")
+                cmd = rflink.Command.SET_TAIL_ANGLE_ZERO.value
+        elif(event.key() == QtCore.Qt.Key_5 or event.key() == QtCore.Qt.Key_Percent):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("左胸鳍归中")
+                cmd = rflink.Command.SET_LEFTPECTFIN_ANGLE_ZERO.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("左胸鳍角度加大")
+                cmd = rflink.Command.SET_LEFTPECTFIN_ANGLE_ADD.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("左胸鳍角度减小")
+                cmd = rflink.Command.SET_LEFTPECTFIN_ANGLE_ABATE.value
+            else:
+                self.show_message("左胸鳍归中")
+                cmd = rflink.Command.SET_LEFTPECTFIN_ANGLE_ZERO.value
+        elif(event.key() == QtCore.Qt.Key_6 or event.key() == QtCore.Qt.Key_AsciiCircum):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("右胸鳍归中")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_ANGLE_ZERO.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("右胸鳍角度加大")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_ANGLE_ADD.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("右胸鳍角度减小")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_ANGLE_ABATE.value
+            else:
+                self.show_message("右胸鳍归中")
+                cmd = rflink.Command.SET_RIGHTPECTFIN_ANGLE_ZERO.value
+        elif(event.key() == QtCore.Qt.Key_7 or event.key() == QtCore.Qt.Key_Ampersand):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("胸鳍归中")
+                cmd = rflink.Command.SET_PECTFIN_ANGLE_ZERO.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("胸鳍角度加大")
+                cmd = rflink.Command.SET_PECTFIN_ANGLE_ADD.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("胸鳍角度减小")
+                cmd = rflink.Command.SET_PECTFIN_ANGLE_ABATE.value
+            else:
+                self.show_message("胸鳍归中")
+                cmd = rflink.Command.SET_PECTFIN_ANGLE_ZERO.value
+        elif(event.key() == QtCore.Qt.Key_8 or event.key() == QtCore.Qt.Key_Asterisk):   
+            if (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier):
+                self.show_message("吸排水归中")
+                cmd = rflink.Command.SET_BALLAST_POS_ZERO.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier):
+                self.show_message("吸排水位移加大")
+                cmd = rflink.Command.SET_BALLAST_POS_ADD.value
+            elif (QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.AltModifier):
+                self.show_message("吸排水位移减小")
+                cmd = rflink.Command.SET_BALLAST_POS_ABATE.value
+            else:
+                self.show_message("吸排水归中")
+                cmd = rflink.Command.SET_BALLAST_POS_ZERO.value
+        
+        # 数据打包
+        if cmd is not None:
+            datapack = rftool.RFLink_packdata(cmd, 0)
+            # 数据发送
+            with QtCore.QMutexLocker(ser_mutex):
+                try:
+                    send_sertool.write_cmd(datapack)
+                except serial.serialutil.SerialException:
+                    # self.statusBar().showMessage('串口未打开,无法发送')
+                    self.show_message('串口未打开,无法发送')
 
 if __name__ == '__main__':
 
