@@ -76,11 +76,11 @@ class AnalysisBtnWin(QtWidgets.QWidget):
                 datastr = datastr + '\n'
                 self.txtfile.write(datastr)
             else:
-                databag = self.binfile.read(20)
+                databag = self.binfile.read(24)
                 if not databag:
                     break
                 # 数据格式:系统时间(4bytes uint32)+欧拉角1(4bytes float)+欧拉角2(4bytes float)+欧拉角3(4bytes float)+压敏电阻1(2bytes uint16)+压敏电阻2(2bytes uint16)
-                datatuple = struct.unpack('ffffHH', databag)
+                datatuple = struct.unpack('ffffHHf', databag)
                 datastr = ''
                 for data in datatuple:
                     datastr = datastr + ' ' + str(data)

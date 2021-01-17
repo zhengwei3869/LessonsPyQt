@@ -1417,19 +1417,8 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         else: # 其他指令,也就是rflink中定义的指令
             if cmd in rflink.Command.__members__:
                 self.cmdshell_text_browser.append("<font color='DodgerBlue'>Execute&nbsp;"+ instr + "</font>")
-                # 如果是设置运动参数相关的命令
-                if rflink.Command[cmd] is rflink.Command.SET_SINE_MOTION_AMP \
-                    or rflink.Command[cmd] is rflink.Command.SET_SINE_MOTION_FREQ \
-                    or rflink.Command[cmd] is rflink.Command.SET_SINE_MOTION_OFFSET:
-                    try:
-                        data = (instrlist[1]).encode('ascii')
-                    except IndexError:
-                        self.cmdshell_text_browser.append("<font color='red'>Error&nbsp;:&nbsp;Command&nbsp;parameters&nbsp;too&nbsp;be&nbsp;less!</font>")
-                        self.cmdshell_text_browser.append(
-                            "<font color='DarkOrange'>Usage&nbsp;:&nbsp;SET_SINE_MOTION_AMP&nbsp;[float]</font>")
-                        return
                 # 如果是设置是否读取数据文件相关的命令
-                elif rflink.Command[cmd] is rflink.Command.GOTO_STORAGE_DATA \
+                if rflink.Command[cmd] is rflink.Command.GOTO_STORAGE_DATA \
                   or rflink.Command[cmd] is rflink.Command.GOTO_SEND_DATA:
                     try:
                         filenamelist = instrlist[2].split('.')
@@ -1447,6 +1436,15 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                         return
                 # 如果是设置飞轮操作的相关命令
                 elif rflink.Command[cmd] is rflink.Command.SET_FLYWHEEL_CMD:
+                    try:
+                        data = (instrlist[1]).encode('ascii')
+                    except IndexError:
+                        self.cmdshell_text_browser.append("<font color='red'>Error&nbsp;:&nbsp;Command&nbsp;parameters&nbsp;too&nbsp;be&nbsp;less!</font>")
+                        self.cmdshell_text_browser.append(
+                            "<font color='DarkOrange'>Usage&nbsp;:&nbsp;SET_FLYWHEEL_CMD&nbsp;[char]</font>")
+                        return
+                elif rflink.Command[cmd] is rflink.Command.SET_DEPTHCTL_K1 \
+                    or rflink.Command[cmd] is rflink.Command.SET_DEPTHCTL_K2:
                     try:
                         data = (instrlist[1]).encode('ascii')
                     except IndexError:

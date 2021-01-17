@@ -132,7 +132,8 @@ Command = Enum('Command',(\
     'SET_DATASHOW_OVER',\
     'SET_DEPTHCTL_START',\
     'SET_DEPTHCTL_STOP',\
-    'SET_DEPTHCTL_PARAM',\
+    'SET_DEPTHCTL_K1',\
+    'SET_DEPTHCTL_K2',\
     # 读取状态指令
     'READ_ROBOT_STATUS',\
     'READ_CPG_PARAM',\
