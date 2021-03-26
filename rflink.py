@@ -91,6 +91,9 @@ Command = Enum('Command',(\
 	'SET_RIGHTPECTFIN_ANGLE_ZERO',\
 	'SET_RIGHTPECTFIN_ANGLE_ABATE',\
     'SET_RIGHTPECTFIN_PWM',\
+    # 静态吸附指令
+    'SET_STATIC_ATTACH_START',\
+    'SET_STATIC_ATTACH_STOP',\
     # 电磁阀控制指令
     'SET_VALVE_ON',\
     'SET_VALVE_OFF',\
@@ -134,8 +137,12 @@ Command = Enum('Command',(\
     'SET_DEPTHCTL_STOP',\
     'SET_DEPTHCTL_K1',\
     'SET_DEPTHCTL_K2',\
+    'SET_PID_P',\
+    'SET_PID_I',\
+    'SET_PID_D',\
     # 读取状态指令
     'READ_ROBOT_STATUS',\
+    'READ_MOTION_PARAM',\
     'READ_CPG_PARAM',\
     'READ_SINE_MOTION_PARAM',\
     'READ_IMU1_ATTITUDE',\
@@ -289,7 +296,7 @@ if __name__ == "__main__":
     # rf.RFLink_receivedata(b'\x00')
     # rf.RFLink_receivedata(b'\x01')
     # print(rf.RFLink_receivedata(b'\x13'))
-    print(Command(1))
+    print(Command(132))
 
 
 

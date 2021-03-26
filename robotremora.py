@@ -920,6 +920,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial1_com_combo.addItem('COM12')
         self.serial1_com_combo.addItem('COM13')
         self.serial1_com_combo.addItem('COM14')
+        self.serial1_com_combo.addItem('COM15')
         self.serial1_com_combo.setFixedSize(140, 30)
         self.serial_layout.addWidget(self.serial1_com_combo, 2, 0, 1, 2, QtCore.Qt.AlignLeft)
 
@@ -969,6 +970,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
         self.serial2_com_combo.addItem('COM12')
         self.serial2_com_combo.addItem('COM13')
         self.serial2_com_combo.addItem('COM14')
+        self.serial2_com_combo.addItem('COM15')
         self.serial2_com_combo.setFixedSize(140, 30)
         self.serial_layout.addWidget(self.serial2_com_combo, 4, 0, 1, 2, QtCore.Qt.AlignLeft)
 
@@ -1418,6 +1420,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             if cmd in rflink.Command.__members__:
                 self.cmdshell_text_browser.append("<font color='DodgerBlue'>Execute&nbsp;"+ instr + "</font>")
                 # 如果是设置是否读取数据文件相关的命令
+                data = 0
                 if rflink.Command[cmd] is rflink.Command.GOTO_STORAGE_DATA \
                   or rflink.Command[cmd] is rflink.Command.GOTO_SEND_DATA:
                     try:
@@ -1444,7 +1447,10 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
                             "<font color='DarkOrange'>Usage&nbsp;:&nbsp;SET_FLYWHEEL_CMD&nbsp;[char]</font>")
                         return
                 elif rflink.Command[cmd] is rflink.Command.SET_DEPTHCTL_K1 \
-                    or rflink.Command[cmd] is rflink.Command.SET_DEPTHCTL_K2:
+                    or rflink.Command[cmd] is rflink.Command.SET_DEPTHCTL_K2 \
+                    or rflink.Command[cmd] is rflink.Command.SET_PID_P \
+                    or rflink.Command[cmd] is rflink.Command.SET_PID_I \
+                    or rflink.Command[cmd] is rflink.Command.SET_PID_D:
                     try:
                         data = (instrlist[1]).encode('ascii')
                     except IndexError:
@@ -2273,6 +2279,7 @@ class RobotRemoraWindow(QtWidgets.QMainWindow): # 主窗口
             # 读取当前消息
             mes = rftool.message
             rf_mutex.unlock()
+            print(mes)
             # 刷新cmdshell
             self.cmdshell_text_browser.append("<font color='orange'>"+str(mes[1:],'ascii')+"</font>")
 
